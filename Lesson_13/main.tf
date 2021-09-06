@@ -22,6 +22,8 @@ locals { //combined variables
   country           = "Canada"
   city              = "Deadmonton"
   az_list           = join(",", data.aws_availability_zone.available.names)
+  region = data.aws_region.current.description
+  location = "In ${local.region} there are AZs: ${local.az_list}"
 }
 
 resource "aws_eip" "my_static_ip" {

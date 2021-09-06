@@ -9,7 +9,6 @@ provider "aws" {
   region = var.region
 }
 
-
 data "aws_ami" "latest_amazon_linux" {
   owners      = ["amazon"]
   most_recent = true
@@ -19,23 +18,11 @@ data "aws_ami" "latest_amazon_linux" {
   }
 }
 
-
 resource "aws_eip" "my_static_ip" {
   instance = aws_instance.my_server.id
-  //tags     = var.common_tags
   tags = merge(var.common_tags, { Name = "${var.common_tags["Environment"]} Server IP" })
 
-  /*
-  tags = {
-    Name    = "Server IP"
-    Owner   = "Overlord"
-    Project = "Phoenix"
-  }
-*/
-
 }
-
-
 
 resource "aws_instance" "my_server" {
   ami                    = data.aws_ami.latest_amazon_linux.id
@@ -44,15 +31,13 @@ resource "aws_instance" "my_server" {
   monitoring             = var.enable_detailed_monitoring
 
   tags = merge(var.common_tags, { Name = "${var.common_tags["Environment"]} Server Build by Terraform" })
-
 }
-
 
 resource "aws_security_group" "my_server" {
   name = "My Security Group"
 
   dynamic "ingress" {
-    for_each = var.allow_ports
+    for_each = var.allow_ports // from variable list
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -68,5 +53,4 @@ resource "aws_security_group" "my_server" {
   }
 
   tags = merge(var.common_tags, { Name = "${var.common_tags["Environment"]} Server SecurityGroup" })
-
 }
