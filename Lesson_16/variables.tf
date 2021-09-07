@@ -6,6 +6,8 @@ variable "aws_region" {
 
 variable "aws_resource_prefix" {
   description = "Prefix to be used in the naming of some of the created AWS resources e.g. demo-webapp"
+  type        = string
+  default     = "test"
 }
 
 variable "aws_access_key" {
@@ -38,4 +40,18 @@ variable "common_tags" {
     CostCenter  = "Free Tier"
     Environment = "dev"
   }
+}
+
+# EKS variables
+variable "aws_eks_cluster_name" {
+  description = "EKS Cluster name. Must be between 1-100 characters in length. Must begin with an alphanumeric character, and must only contain alphanumeric characters, dashes and underscores"
+  type        = string
+  default     = "test-cluster"
+}
+
+# ECR variables
+variable "aws_ecr_repository_name" {
+  description = "The name of private image registry"
+  type        = string
+  default     = "test"
 }
