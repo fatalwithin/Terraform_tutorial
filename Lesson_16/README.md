@@ -596,3 +596,64 @@ Hello world
 This is a multi-line string with 'quotes' in "it".
 ```
 
+
+
+## How to use Imagepullsecret in Helm3?
+
+I use this setup and works fine.
+
+In deployment.yaml
+
+```yaml
+spec:
+	{{- with .Values.imagePullSecrets }}
+		imagePullSecrets:
+			{{- toYaml . | nindent 8 }}
+	{{- end }}
+		containers:
+```
+
+In values.yaml
+
+```yaml
+imagePullSecrets:
+  - name: regcred
+```
+
+And create secret `regcred` manually using
+
+```bash
+$ kubectl create secret docker-registry regcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+```
+
+You can find detailed documentation [here](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+
+
+
+## How to use AWS ECR images with AWS EKS?
+
+Detailed info is here: https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_on_EKS.html
+
+If you get any permission issues on pushing your image via AWS CLI - make sure your AWS CLI role has permission [AmazonEC2ContainerRegistryFullAccess](https://console.aws.amazon.com/iam/home?region=ap-southeast-1#/policies/arn%3Aaws%3Aiam%3A%3Aaws%3Apolicy%2FAmazonEC2ContainerRegistryFullAccess).
+
+
+
+## How to make ALB Kubernetes Ingress Controller on Amazon EKS?
+
+https://www.bogotobogo.com/DevOps/Docker/Docker-Kubernetes-ALB-Ingress-Controller-with-EKS.php
+
+https://aws.amazon.com/ru/blogs/opensource/kubernetes-ingress-aws-alb-ingress-controller/
+
+ 
+
+## How to run Node.JS app with Helm on Kubernetes?
+
+https://medium.com/@cloudegl/run-node-js-app-using-kubernetes-helm-bb87747785a
+
+How to dockerize and deploy Node.JS app with Gitlab CI:
+
+https://taylor.callsen.me/how-to-dockerize-a-nodejs-app-and-deploy-it-using-gitlab-ci/
+
+https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+
+ 

@@ -1,5 +1,5 @@
 # IAM Role to be granted ECR permissions
-data "aws_iam_role" "ecr" {
+resource "aws_iam_role" "ecr" {
   name = "ecr"
 }
 
@@ -19,12 +19,8 @@ Repositories configured with immutable tags will prevent image tags from being o
   tags = merge(var.common_tags, { Name = "${var.common_tags["Environment"]} ECR repository build by Terraform" })
 }
 
-data "aws_ecr_repository" "test" {
-  name = "test"
-}
-
 data "aws_ecr_authorization_token" "test" {
-  registry_id = aws_ecr_repository.test.id
+  registry_id = aws_ecr_repository.test.registry_id
 }
 
 /*
