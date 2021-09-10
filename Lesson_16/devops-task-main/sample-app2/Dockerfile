@@ -34,13 +34,5 @@ EXPOSE 8080
 
 CMD [ "npm", "start" ] 
 
-#need to create .dockerignore with the following lines in it:
-#node_modules
-#npm-debug.log
-#Dockerfile
-#.dockerignore
-#.git
-#.gitignore
-
 
 

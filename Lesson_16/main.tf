@@ -6,24 +6,12 @@
 # $ TF_VAR_access_key = 
 # $ TF_VAR_secret_key = 
 #
-# Needed resources:
-#   - EKS Control Plane VPC
-#     - EKS control plane private subnet
-#     - EKS control plane public subnet
-#     - EKS NLB load balancer
-#     - EKS external IP and address for kubectl API access
-#     - EKS cluster
-#     - IAM role to work with AWS EKS IAM roles
-#     - EKS IAM policy 
-#   - Customer (worker) VPC
-#     - autoscaling group for worker nodes
-#     - customer (worker) load balancer
-#     - ECR private image registry
-#     - IAM role to work with ECR image registry
-#     - ECR IAM policy
-#   - IAM user for CI/CD tasks (builder/deployer)
-#   - 
-# 
+# The order of infra resources creation:
+#   - ECR image registry
+#   - VPC resources for EKS cluster via vpc terrafoerm module
+#   - EKS cluster - 2 or 3 small workers in order to keep costs low (although EKS costs $0.1 per cluster )
+#   - OpenID connect provider for EKS cluster for ALB Ingress Controller to work
+#   - OIDC IAM role for 
 #-------------------------------------------------------------------------------
 
 terraform {

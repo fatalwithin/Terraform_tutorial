@@ -18,11 +18,13 @@ module "vpc" {
 
   tags = merge(var.common_tags, { "kubernetes.io/cluster/${var.aws_eks_cluster_name}" = "shared" })
 
+  # public subnets are for internet-facing load balancers and ALB controller auto-discovery
   public_subnet_tags = {
     "kubernetes.io/cluster/${var.aws_eks_cluster_name}" = "shared"
     "kubernetes.io/role/elb"                            = "1"
   }
 
+  # private subnets are for internal load balancers and ALB controller auto-discovery
   private_subnet_tags = {
     "kubernetes.io/cluster/${var.aws_eks_cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"                   = "1"

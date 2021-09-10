@@ -19,7 +19,6 @@ RUN adduser \
     --uid "$UID" \
     "$USER"
 
-# RUN addgroup -r signageos && adduser -s /bin/false -g signageos signageos
 RUN chown -R $USER /app
 
 WORKDIR /app
@@ -33,15 +32,7 @@ RUN npm i
 
 EXPOSE 8080
 
-CMD [ "npm", "start" ] 
-
-#need to create .dockerignore with the following lines in it:
-#node_modules
-#npm-debug.log
-#Dockerfile
-#.dockerignore
-#.git
-#.gitignore
+CMD [ "npm", "start" ]
 
 
 

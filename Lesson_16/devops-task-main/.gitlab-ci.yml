@@ -1,0 +1,125 @@
+# DOCKER_TLS_CERTDIR needed for DinD service
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  CI_REGISTRY_IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
+  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+
+stages:
+  - test
+  - build
+  - deploy
+
+# Test stage
+test_sample_app1:
+  stage: test
+  image:
+    name: node:lts-alpine
+  script:
+    - npm run test
+  rules:
+    changes:
+      - sample-app1/*
+    when: manual
+
+test_sample_app2:
+  stage: test
+  image:
+    name: node:lts-alpine
+  script:
+    - npm run test
+  rules:
+    changes:
+      - sample-app2/*
+    when: manual
+
+# DOCKER_HUB_TOKEN is a password for private image registry
+build_sample_app1:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:19.03.12-dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  script:
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+  rules:
+    changes:
+      - sample-app1/*
+    when: manual
+
+build_sample_app2:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:19.03.12-dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  script:
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+  rules:
+    changes:
+      - sample-app2/*
+    when: manual
+
+.deploy_template:
+  stage: deploy
+  image: alpine/helm:latest
+  script:
+    # Setting up kubeconfig
+    - export KUBECONFIG=${KUBECONFIG}
+    # Deploy via Helm
+    - cd ./test-chart/
+    - helm upgrade ${APP_NAME} ./charts --install --values=../${APP_NAME}/values.${BUILD_VARIANT}.yaml --namespace ${APP_NAME}
+    # get the internet address of the application
+    - kubectl describe ingress -n ${APP_NAME} ${APP_NAME} | grep Address
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: manual
+
+deploy_dev_sample_app1:
+  extends: .deploy_template
+  variables:
+    KUBE_NAMESPACE: "dev"
+    BUILD_VARIANT: "dev"
+    APP_NAME: "sample-app1"
+  environment:
+    name: dev # values.dev.yaml
+  tags:
+    - k8s
+    - dev
+  rules:
+    changes:
+      - sample-app1/*
+
+deploy_dev_sample_app2:
+  extends: .deploy_template
+  variables:
+    KUBE_NAMESPACE: "dev"
+    BUILD_VARIANT: "dev"
+    APP_NAME: "sample-app2"
+  environment:
+    name: dev # values.dev.yaml
+  tags:
+    - k8s
+    - dev
+  rules:
+    changes:
+      - sample-app2/*
+# deploy_prod:
+#   extends: .deploy_template
+#   variables:
+#     KUBE_NAMESPACE: "prod"
+#     BUILD_VARIANT: "prod"
+#   environment:
+#     name: prod # values.prod.yaml
+#   only:
+#     - master
+#   tags:
+#     - k8s
+#     - prod
+#   when: manual

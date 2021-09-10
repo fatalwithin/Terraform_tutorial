@@ -49,6 +49,13 @@ variable "aws_eks_cluster_name" {
   default     = "test-cluster"
 }
 
+variable "oidc-role" {
+  description = "After creating OIDC policy, we need to attach it to the role which is going to be assumed by the OIDC provider."
+  type        = string
+  default     = "S3-Readonly-OIDC-Role"
+
+}
+
 # ECR variables
 variable "aws_ecr_repository_name" {
   description = "The name of private image registry"

@@ -3,7 +3,8 @@ module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = var.aws_eks_cluster_name
   cluster_version = "1.20"
-  subnets         = module.vpc.private_subnets
+  subnets         = module.vpc.private_subnets # worker nodes should be deployed in private subnets
+  enable_irsa     = true                       # to enable the OIDC provider for this eks cluster, you just need to add the following input 
 
   tags = merge(var.common_tags,
     {
@@ -87,6 +88,7 @@ resource "aws_security_group" "all_worker_mgmt" {
 
 # Cluster access
 provider "kubernetes" {
+  alias                  = "eks" # to refer to it later
   host                   = data.aws_eks_cluster.test_cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.test_cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.test_cluster.token

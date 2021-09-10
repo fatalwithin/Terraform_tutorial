@@ -60,13 +60,6 @@ output "ecr_token_expires_at" {
 }
 
 #-------------------------------------------------------------------------------
-# AWS SSM outputs
-#-------------------------------------------------------------------------------
-output "ecr_password" {
-  value = aws_ssm_parameter.my_ecr_password.value
-}
-
-#-------------------------------------------------------------------------------
 # CI/CD account credentials outputs
 #-------------------------------------------------------------------------------
 output "publisher_access_key" {
@@ -105,4 +98,16 @@ output "kubectl_config" {
 output "config_map_aws_auth" {
   description = "A kubernetes configuration to authenticate to this EKS cluster."
   value       = module.eks.config_map_aws_auth
+}
+
+output "cluster_role" {
+  description = "Cluster role name"
+  value       = module.eks.cluster_iam_role_name
+
+}
+
+output "cluster_worker_role" {
+  description = "cluster worker role name"
+  value       = module.eks.worker_iam_role_name
+
 }
